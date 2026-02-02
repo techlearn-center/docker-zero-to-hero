@@ -165,9 +165,26 @@ docker-zero-to-hero/
 ├── ...
 ├── 13-educational-resources/
 └── resources/
-    └── cheatsheets/
-        └── docker-commands.md   # Command reference
+    ├── interview-prep.md       # 28 interview questions with answers
+    ├── self-reflection.md      # Per-module reflection journal
+    ├── troubleshooting.md      # Common issues FAQ
+    ├── cheatsheets/
+    │   ├── docker-commands.md  # CLI command reference
+    │   └── docker-compose-cheatsheet.md
+    └── diagrams/
+        └── docker-architecture.md  # Visual architecture diagrams
 ```
+
+## Resources
+
+| Resource | Description |
+|----------|-------------|
+| [Interview Prep](./resources/interview-prep.md) | 28 Docker interview questions (beginner to advanced) with detailed answers |
+| [Self-Reflection Journal](./resources/self-reflection.md) | Per-module reflection prompts, confidence checks, and teach-back exercises |
+| [Troubleshooting Guide](./resources/troubleshooting.md) | Solutions to common Docker issues |
+| [Docker Commands Cheatsheet](./resources/cheatsheets/docker-commands.md) | Quick reference for all Docker CLI commands |
+| [Compose Cheatsheet](./resources/cheatsheets/docker-compose-cheatsheet.md) | Docker Compose YAML syntax and commands |
+| [Architecture Diagrams](./resources/diagrams/docker-architecture.md) | Visual diagrams of Docker components |
 
 ---
 

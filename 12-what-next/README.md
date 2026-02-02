@@ -72,9 +72,25 @@ Rate yourself on each skill:
 
 ---
 
+## Self-Reflection
+
+Take time to reflect on what you've learned. We've created a comprehensive learning journal with:
+- Per-module reflection questions
+- Confidence self-assessment tables
+- "Teach-back" prompts (explain concepts in your own words)
+- Before/after skills comparison
+
+**[Open the Self-Reflection Journal](../resources/self-reflection.md)**
+
+---
+
 ## Interview Preparation
 
-Docker questions come up frequently in DevOps, SRE, and backend interviews. Here are common topics:
+Docker questions come up frequently in DevOps, SRE, and backend interviews. We've created a comprehensive interview prep guide with **28 questions** across beginner, intermediate, and advanced levels.
+
+**[Full Interview Prep Guide (28 questions)](../resources/interview-prep.md)** — Covers fundamentals, networking, storage, security, architecture, and scenario-based questions.
+
+Here's a preview of common topics:
 
 ### Conceptual Questions
 
