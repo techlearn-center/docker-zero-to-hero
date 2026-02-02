@@ -1,0 +1,31 @@
+# ============================================
+# Multi-Stage Dockerfile — Solution
+# ============================================
+# Stage 1 installs ALL dependencies (dev + prod).
+# Stage 2 installs ONLY production dependencies.
+# Result: smaller, cleaner production image.
+# ============================================
+
+# Stage 1: Install all dependencies (for testing/building)
+FROM node:18-alpine AS deps
+WORKDIR /app
+COPY package.json .
+RUN npm install
+
+# Stage 2: Production image
+FROM node:18-alpine
+WORKDIR /app
+
+# Create non-root user
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+COPY package.json .
+RUN npm install --production
+
+COPY . .
+
+# Switch to non-root user
+USER appuser
+
+EXPOSE 3000
+CMD ["node", "src/index.js"]

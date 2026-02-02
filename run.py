@@ -372,14 +372,14 @@ def check_compose_app_service():
     """Module 10: App service defined in docker-compose.yml"""
     compose = read_file(os.path.join(ROOT_DIR, "docker-compose.yml"))
 
-    has_app = re.search(r"^\s+app:", compose, re.MULTILINE)
+    has_app = re.search(r"^\s+(app|web):", compose, re.MULTILINE)
     has_build = "build:" in compose
 
     if has_app and has_build:
         return True, "App service with build configuration defined"
     if has_app:
         return False, "App service exists but needs 'build:' directive"
-    return False, "Define an 'app' service in docker-compose.yml"
+    return False, "Define a 'web' (or 'app') service in docker-compose.yml"
 
 
 def check_compose_mysql_service():
