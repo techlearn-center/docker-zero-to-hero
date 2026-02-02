@@ -1,0 +1,158 @@
+{
+  "id": "docker-zero-to-hero",
+  "title": "Docker Zero to Hero: The Complete Workshop",
+  "description": "Master Docker from installation to multi-container applications. Build, ship, and run a containerized todo app through 14 progressive modules covering Dockerfiles, volumes, networking, Compose, and production best practices.",
+  "category": "devops",
+  "track": "containers",
+  "difficulty": "beginner-to-intermediate",
+  "estimated_time": "6-8 hours",
+  "points": 100,
+  "passing_score": 70,
+  "prerequisites": [
+    "Basic command line knowledge",
+    "A computer with admin/root access",
+    "Basic understanding of web applications"
+  ],
+  "skills_learned": [
+    "Installing and configuring Docker",
+    "Understanding containers vs virtual machines",
+    "Writing Dockerfiles from scratch",
+    "Building and tagging Docker images",
+    "Running containers with port mapping",
+    "Managing data with volumes and bind mounts",
+    "Multi-container networking",
+    "Docker Compose for multi-service apps",
+    "Image optimization and multi-stage builds",
+    "Container best practices for production"
+  ],
+  "tech_stack": {
+    "language": "javascript",
+    "runtime": "Node.js 18",
+    "tools": [
+      "Docker",
+      "Docker Compose"
+    ],
+    "frameworks": [
+      "Express.js"
+    ],
+    "databases": [
+      "SQLite",
+      "MySQL"
+    ]
+  },
+  "modules": [
+    {
+      "id": "00-get-docker",
+      "title": "Get Docker",
+      "type": "setup",
+      "points": 0
+    },
+    {
+      "id": "01-what-is-docker",
+      "title": "What is Docker?",
+      "type": "conceptual",
+      "points": 0
+    },
+    {
+      "id": "02-introduction",
+      "title": "Introduction",
+      "type": "conceptual",
+      "points": 0
+    },
+    {
+      "id": "03-docker-concepts",
+      "title": "Docker Concepts",
+      "type": "conceptual",
+      "points": 0
+    },
+    {
+      "id": "04-containerize-application",
+      "title": "Containerize an Application",
+      "type": "hands-on",
+      "points": 25
+    },
+    {
+      "id": "05-update-application",
+      "title": "Update the Application",
+      "type": "hands-on",
+      "points": 10
+    },
+    {
+      "id": "06-share-application",
+      "title": "Share the Application",
+      "type": "hands-on",
+      "points": 10
+    },
+    {
+      "id": "07-persist-the-db",
+      "title": "Persist the DB",
+      "type": "hands-on",
+      "points": 10
+    },
+    {
+      "id": "08-use-bind-mounts",
+      "title": "Use Bind Mounts",
+      "type": "hands-on",
+      "points": 10
+    },
+    {
+      "id": "09-multi-container-apps",
+      "title": "Multi-Container Apps",
+      "type": "hands-on",
+      "points": 15
+    },
+    {
+      "id": "10-use-docker-compose",
+      "title": "Use Docker Compose",
+      "type": "hands-on",
+      "points": 15
+    },
+    {
+      "id": "11-image-building-best-practices",
+      "title": "Image-Building Best Practices",
+      "type": "hands-on",
+      "points": 5
+    },
+    {
+      "id": "12-what-next",
+      "title": "What Next",
+      "type": "reference",
+      "points": 0
+    },
+    {
+      "id": "13-educational-resources",
+      "title": "Educational Resources",
+      "type": "reference",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "dockerfile_exists": 5,
+    "dockerfile_from_node": 3,
+    "dockerfile_workdir": 2,
+    "dockerfile_copy_package_first": 3,
+    "dockerfile_run_install": 3,
+    "dockerfile_copy_source": 2,
+    "dockerfile_expose": 2,
+    "dockerfile_cmd": 3,
+    "image_builds_successfully": 2,
+    "source_code_modified": 5,
+    "update_text_changed": 5,
+    "image_tagged_correctly": 5,
+    "tag_format_valid": 5,
+    "volume_config_present": 5,
+    "volume_mount_path_correct": 5,
+    "bind_mount_config": 5,
+    "bind_mount_dev_workflow": 5,
+    "network_env_mysql_host": 5,
+    "network_env_mysql_credentials": 5,
+    "multi_container_network": 5,
+    "compose_file_exists": 3,
+    "compose_app_service": 3,
+    "compose_mysql_service": 3,
+    "compose_volumes_defined": 3,
+    "compose_ports_mapped": 3,
+    "multistage_dockerfile": 3,
+    "dockerignore_exists": 2
+  }
+}

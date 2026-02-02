@@ -1,0 +1,279 @@
+name: Grade Docker Workshop
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  grade:
+    name: Grade Docker Implementation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      # ── Module 04: Containerize an Application (25 pts) ──
+
+      - name: "Check: Dockerfile exists (5 pts)"
+        id: dockerfile_exists
+        run: |
+          if [ -f "app/Dockerfile" ]; then
+            echo "passed=true" >> $GITHUB_OUTPUT
+            echo "✅ Dockerfile found in app/" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "passed=false" >> $GITHUB_OUTPUT
+            echo "❌ No Dockerfile found in app/ directory" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: "Check: Dockerfile uses node base image (3 pts)"
+        id: dockerfile_from
+        run: |
+          if grep -qi "FROM.*node:" app/Dockerfile 2>/dev/null; then
+            echo "passed=true" >> $GITHUB_OUTPUT
+            echo "✅ Dockerfile uses node base image" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "passed=false" >> $GITHUB_OUTPUT
+            echo "❌ Dockerfile should use a node base image" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: "Check: WORKDIR set (2 pts)"
+        id: dockerfile_workdir
+        run: |
+          if grep -qi "WORKDIR.*/app" app/Dockerfile 2>/dev/null; then
+            echo "passed=true" >> $GITHUB_OUTPUT
+            echo "✅ WORKDIR set to /app" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "passed=false" >> $GITHUB_OUTPUT
+            echo "❌ Dockerfile should set WORKDIR" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: "Check: COPY package.json first (3 pts)"
+        id: dockerfile_copy_pkg
+        run: |
+          # Get non-comment lines with COPY
+          COPIES=$(grep -in "^COPY" app/Dockerfile 2>/dev/null || true)
+          FIRST_COPY=$(echo "$COPIES" | head -1)
+          if echo "$FIRST_COPY" | grep -qi "package"; then
+            echo "passed=true" >> $GITHUB_OUTPUT
+            echo "✅ package.json copied before source" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "passed=false" >> $GITHUB_OUTPUT
+            echo "❌ COPY package.json before COPY . ." >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: "Check: RUN npm/yarn install (3 pts)"
+        id: dockerfile_install
+        run: |
+          if grep -qiE "RUN.*(npm|yarn)\s+install" app/Dockerfile 2>/dev/null; then
+            echo "passed=true" >> $GITHUB_OUTPUT
+            echo "✅ Dependencies installed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "passed=false" >> $GITHUB_OUTPUT
+            echo "❌ RUN npm install missing" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: "Check: EXPOSE 3000 (2 pts)"
+        id: dockerfile_expose
+        run: |
+          if grep -qi "EXPOSE.*3000" app/Dockerfile 2>/dev/null; then
+            echo "passed=true" >> $GITHUB_OUTPUT
+            echo "✅ Port 3000 exposed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "passed=false" >> $GITHUB_OUTPUT
+            echo "❌ EXPOSE 3000 missing" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: "Check: CMD defined (3 pts)"
+        id: dockerfile_cmd
+        run: |
+          if grep -qi "^CMD" app/Dockerfile 2>/dev/null; then
+            echo "passed=true" >> $GITHUB_OUTPUT
+            echo "✅ CMD instruction defined" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "passed=false" >> $GITHUB_OUTPUT
+            echo "❌ CMD instruction missing" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: "Check: Image builds successfully (2 pts)"
+        id: image_builds
+        run: |
+          if docker build -t todo-app-ci ./app 2>/dev/null; then
+            echo "passed=true" >> $GITHUB_OUTPUT
+            echo "✅ Docker image builds successfully" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "passed=false" >> $GITHUB_OUTPUT
+            echo "❌ Docker build failed" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      # ── Module 05: Update the Application (10 pts) ──
+
+      - name: "Check: Source code modified (5 pts)"
+        id: source_modified
+        run: |
+          ORIGINAL="No todos yet! Add one above to get started."
+          if ! grep -q "$ORIGINAL" app/src/static/index.html 2>/dev/null; then
+            echo "passed=true" >> $GITHUB_OUTPUT
+            echo "✅ Source code modified" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "passed=false" >> $GITHUB_OUTPUT
+            echo "❌ Modify empty state text in index.html" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: "Check: Empty state element preserved (5 pts)"
+        id: update_preserved
+        run: |
+          if grep -q 'id="empty-state"' app/src/static/index.html 2>/dev/null; then
+            ORIGINAL="No todos yet! Add one above to get started."
+            if ! grep -q "$ORIGINAL" app/src/static/index.html; then
+              echo "passed=true" >> $GITHUB_OUTPUT
+              echo "✅ Empty state text updated" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "passed=false" >> $GITHUB_OUTPUT
+              echo "❌ Change the empty state text" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "passed=false" >> $GITHUB_OUTPUT
+            echo "❌ Keep the empty-state element" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      # ── Module 10: Docker Compose (15 pts) ──
+
+      - name: "Check: docker-compose.yml services (3 pts)"
+        id: compose_exists
+        run: |
+          if grep -q "services:" docker-compose.yml 2>/dev/null; then
+            echo "passed=true" >> $GITHUB_OUTPUT
+            echo "✅ docker-compose.yml has services" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "passed=false" >> $GITHUB_OUTPUT
+            echo "❌ docker-compose.yml needs services" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: "Check: App service (3 pts)"
+        id: compose_app
+        run: |
+          if grep -q "app:" docker-compose.yml && grep -q "build:" docker-compose.yml 2>/dev/null; then
+            echo "passed=true" >> $GITHUB_OUTPUT
+            echo "✅ App service defined" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "passed=false" >> $GITHUB_OUTPUT
+            echo "❌ Define app service with build" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: "Check: MySQL service (3 pts)"
+        id: compose_mysql
+        run: |
+          if grep -q "mysql:" docker-compose.yml && grep -q "mysql:8" docker-compose.yml 2>/dev/null; then
+            echo "passed=true" >> $GITHUB_OUTPUT
+            echo "✅ MySQL service defined" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "passed=false" >> $GITHUB_OUTPUT
+            echo "❌ Define mysql service" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: "Check: Volumes defined (3 pts)"
+        id: compose_volumes
+        run: |
+          # Check for top-level volumes
+          if grep -q "^volumes:" docker-compose.yml 2>/dev/null; then
+            echo "passed=true" >> $GITHUB_OUTPUT
+            echo "✅ Named volumes defined" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "passed=false" >> $GITHUB_OUTPUT
+            echo "❌ Define named volumes" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: "Check: Port mapping (3 pts)"
+        id: compose_ports
+        run: |
+          if grep -q "3000:3000" docker-compose.yml 2>/dev/null; then
+            echo "passed=true" >> $GITHUB_OUTPUT
+            echo "✅ Port 3000 mapped" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "passed=false" >> $GITHUB_OUTPUT
+            echo "❌ Map port 3000:3000" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      # ── Module 11: Best Practices (5 pts) ──
+
+      - name: "Check: Multi-stage build (3 pts)"
+        id: multistage
+        run: |
+          FROM_COUNT=$(grep -ci "^FROM" app/Dockerfile 2>/dev/null || echo "0")
+          if [ "$FROM_COUNT" -ge 2 ]; then
+            echo "passed=true" >> $GITHUB_OUTPUT
+            echo "✅ Multi-stage build ($FROM_COUNT stages)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "passed=false" >> $GITHUB_OUTPUT
+            echo "❌ Use multi-stage build" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: "Check: .dockerignore exists (2 pts)"
+        id: dockerignore
+        run: |
+          if [ -f "app/.dockerignore" ]; then
+            echo "passed=true" >> $GITHUB_OUTPUT
+            echo "✅ .dockerignore found" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "passed=false" >> $GITHUB_OUTPUT
+            echo "❌ Create app/.dockerignore" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      # ── Calculate Final Score ──
+
+      - name: Calculate Final Score
+        run: |
+          SCORE=0
+          TOTAL=100
+
+          # Module 04 (25 pts)
+          [ "${{ steps.dockerfile_exists.outputs.passed }}" = "true" ] && SCORE=$((SCORE + 5))
+          [ "${{ steps.dockerfile_from.outputs.passed }}" = "true" ] && SCORE=$((SCORE + 3))
+          [ "${{ steps.dockerfile_workdir.outputs.passed }}" = "true" ] && SCORE=$((SCORE + 2))
+          [ "${{ steps.dockerfile_copy_pkg.outputs.passed }}" = "true" ] && SCORE=$((SCORE + 3))
+          [ "${{ steps.dockerfile_install.outputs.passed }}" = "true" ] && SCORE=$((SCORE + 3))
+          [ "${{ steps.dockerfile_expose.outputs.passed }}" = "true" ] && SCORE=$((SCORE + 2))
+          [ "${{ steps.dockerfile_cmd.outputs.passed }}" = "true" ] && SCORE=$((SCORE + 3))
+          [ "${{ steps.image_builds.outputs.passed }}" = "true" ] && SCORE=$((SCORE + 2))
+
+          # Module 05 (10 pts)
+          [ "${{ steps.source_modified.outputs.passed }}" = "true" ] && SCORE=$((SCORE + 5))
+          [ "${{ steps.update_preserved.outputs.passed }}" = "true" ] && SCORE=$((SCORE + 5))
+
+          # Module 10 (15 pts)
+          [ "${{ steps.compose_exists.outputs.passed }}" = "true" ] && SCORE=$((SCORE + 3))
+          [ "${{ steps.compose_app.outputs.passed }}" = "true" ] && SCORE=$((SCORE + 3))
+          [ "${{ steps.compose_mysql.outputs.passed }}" = "true" ] && SCORE=$((SCORE + 3))
+          [ "${{ steps.compose_volumes.outputs.passed }}" = "true" ] && SCORE=$((SCORE + 3))
+          [ "${{ steps.compose_ports.outputs.passed }}" = "true" ] && SCORE=$((SCORE + 3))
+
+          # Module 11 (5 pts)
+          [ "${{ steps.multistage.outputs.passed }}" = "true" ] && SCORE=$((SCORE + 3))
+          [ "${{ steps.dockerignore.outputs.passed }}" = "true" ] && SCORE=$((SCORE + 2))
+
+          # Note: Modules 06-09 (35 pts) require runtime Docker checks
+          # that are validated by run.py locally
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Final Score: $SCORE / $TOTAL (CI-checkable)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "$SCORE" -ge 50 ]; then
+            echo "✅ **Good progress!** Run \`python run.py\` locally for full 100-point scoring (includes runtime Docker checks)." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ **Keep going!** Complete the Dockerfile and docker-compose.yml to earn more points." >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "💡 *Some checks (volumes, networking, image tagging) require a running Docker environment and are only scored by \`python run.py\`.*" >> $GITHUB_STEP_SUMMARY
